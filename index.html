@@ -1,190 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Unlocking Soon</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=IM+Fell+English+SC&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 <style>
-  body {
-    background-color: #0a0a0a;
-    color: #f5f5f5;
-    font-family: 'Cinzel Decorative', serif;
-    text-align: center;
-    padding: 0;
-    margin: 0;
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
+    body {
+        background-color: #0a0a0a;
+        color: #f5f5f5;
+        font-family: 'Cinzel Decorative', serif;
+        text-align: center;
+        padding: 0;
+        margin: 0;
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
 
-  h1 {
-    font-size: 1.5rem; /* smaller than before */
-    max-width: 90%;
-    text-shadow: 0 0 12px rgba(255, 0, 0, 0.8);
-    margin: 0;
-    user-select: none;
-  }
+    h1 {
+        font-size: 2.2rem;
+        max-width: 90%;
+        text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+    }
 
-  #countdown {
-    font-family: 'IM Fell English SC', serif;
-    font-size: 2.8rem; /* bigger than before */
-    margin-top: 25px;
-    color: #ff4c4c;
-    text-shadow:
-      0 0 10px #ff2a2a,
-      0 0 20px #ff4c4c,
-      0 0 30px #ff6f6f;
-    user-select: none;
-  }
+    #countdown {
+        font-family: 'IM Fell English SC', serif;
+        font-size: 1.8rem;
+        margin-top: 15px;
+        color: #ff4444;
+        text-shadow: 0 0 8px #ff0000;
+    }
 
-  #quote {
-    position: absolute;
-    bottom: 80px;
-    font-size: 1.5rem;
-    font-family: 'IM Fell English SC', serif;
-    color: #ff6666;
-    opacity: 0;
-    pointer-events: none;
-    user-select: none;
-    filter: drop-shadow(0 0 3px #ff3b3b);
-    white-space: nowrap;
-  }
+    #quote {
+        position: absolute;
+        bottom: 80px;
+        font-size: 1.4rem;
+        font-family: 'IM Fell English SC', serif;
+        color: #ff6666;
+        opacity: 0;
+    }
 
-  canvas {
-    position: absolute;
-    left: 0;
-    top: 0;
-    pointer-events: none;
-    user-select: none;
-  }
+    canvas {
+        position: absolute;
+        left: 0;
+        top: 0;
+        pointer-events: none;
+    }
 </style>
 </head>
 <body>
-  <h1>This page will unlock on 15th August 2029, the day you turn 21.</h1>
-  <div id="countdown"></div>
-  <div id="quote">EVERY SECOND HERE KNOWS MORE THAN IT SHOULD</div>
-  <canvas id="particles"></canvas>
+    <h1>This page will unlock on 15th August 2029, the day you turn 21.</h1>
+    <div id="countdown"></div>
+    <div id="quote">EVERY SECOND HERE KNOWS MORE THAN IT SHOULD</div>
+    <canvas id="particles"></canvas>
 
-  <script>
+<script>
     // Countdown Timer
     const countdownEl = document.getElementById('countdown');
     const targetDate = new Date("August 15, 2029 00:00:00").getTime();
 
     function updateCountdown() {
-      const now = new Date().getTime();
-      const distance = targetDate - now;
+        const now = new Date().getTime();
+        const distance = targetDate - now;
 
-      if (distance <= 0) {
-        countdownEl.innerHTML = "Unlocked!";
-        return;
-      }
+        if (distance <= 0) {
+            countdownEl.innerHTML = "Unlocked!";
+            return;
+        }
 
-      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-      countdownEl.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s left`;
+        countdownEl.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s left`;
     }
 
     setInterval(updateCountdown, 1000);
     updateCountdown();
 
-    // Canvas & Particles Setup
+    // Quote Fade In, Ember Particles, Fade Out
     const quoteEl = document.getElementById('quote');
     const canvas = document.getElementById('particles');
     const ctx = canvas.getContext('2d');
+
     let particles = [];
+    let animationStarted = false;
 
     function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // Create particles from text's pixels to simulate embers/fire
     function createParticlesFromText(textElement) {
-      const rect = textElement.getBoundingClientRect();
-      const x = rect.left;
-      const y = rect.top;
-      const w = rect.width;
-      const h = rect.height;
+        const rect = textElement.getBoundingClientRect();
+        const x = rect.left;
+        const y = rect.top;
+        const w = rect.width;
+        const h = rect.height;
 
-      const particleCount = 250;
-      particles = [];
-
-      for (let i = 0; i < particleCount; i++) {
-        // Position roughly within the text area but add some random variance
-        const px = x + Math.random() * w;
-        const py = y + Math.random() * h;
-
-        particles.push({
-          x: px,
-          y: py,
-          vx: (Math.random() - 0.5) * 0.3, // gentle horizontal drift
-          vy: - (Math.random() * 1 + 0.8), // upward velocity (fire ember float)
-          size: Math.random() * 2 + 1.5,
-          alpha: 1,
-          flicker: Math.random() * 0.05 + 0.02,
-          glowBase: Math.floor(180 + Math.random() * 75), // red/orange glow base
-          glowVar: Math.random() * 40
-        });
-      }
-    }
-
-    // Animate the particles like embers/fire gently drifting upward with flicker glow
-    function animateParticles() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      particles.forEach((p, i) => {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.alpha -= 0.008; // slow fade
-
-        // flicker alpha modulation for natural glow effect
-        const flickerAlpha = p.alpha * (0.6 + Math.sin(Date.now() * 0.01 + i) * 0.4);
-
-        const glowColor = `rgba(255, ${Math.floor(p.glowBase + Math.sin(Date.now() * 0.02 + i) * p.glowVar)}, 0, ${flickerAlpha.toFixed(3)})`;
-
-        ctx.fillStyle = glowColor;
-        ctx.shadowColor = glowColor;
-        ctx.shadowBlur = 8;
-
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
-
-        if (p.alpha <= 0 || p.y < -10 || p.x < -10 || p.x > canvas.width + 10) {
-          particles.splice(i, 1);
+        for (let i = 0; i < 200; i++) {
+            particles.push({
+                x: x + Math.random() * w,
+                y: y + Math.random() * h,
+                vx: (Math.random() - 0.5) * 2,
+                vy: Math.random() * -2 - 1,
+                alpha: 1,
+                size: Math.random() * 3 + 2
+            });
         }
-      });
-
-      if (particles.length > 0) {
-        requestAnimationFrame(animateParticles);
-      }
     }
 
-    // Smooth fade-in of quote + ember burn away effect
+    function animateParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach((p, i) => {
+            p.x += p.vx + 0.5; // wind drift right
+            p.y += p.vy;
+            p.alpha -= 0.01;
+            ctx.fillStyle = `rgba(255, ${Math.floor(100 + Math.random()*155)}, 0, ${p.alpha})`;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+
+            if (p.alpha <= 0) particles.splice(i, 1);
+        });
+
+        if (particles.length > 0) {
+            requestAnimationFrame(animateParticles);
+        }
+    }
+
     function startQuoteAnimation() {
-      quoteEl.style.transition = "opacity 2.5s ease-in";
-      quoteEl.style.opacity = "1";
+        quoteEl.style.transition = "opacity 2s ease-in";
+        quoteEl.style.opacity = 1;
 
-      setTimeout(() => {
-        // Begin ember particle creation and fade out
-        createParticlesFromText(quoteEl);
-        quoteEl.style.transition = "opacity 4s ease-out";
-        quoteEl.style.opacity = "0";
-
-        animateParticles();
-      }, 4000);
+        setTimeout(() => {
+            createParticlesFromText(quoteEl);
+            quoteEl.style.opacity = 0;
+            animateParticles();
+        }, 3000);
     }
 
     setTimeout(startQuoteAnimation, 2000);
-  </script>
+</script>
 </body>
 </html>
