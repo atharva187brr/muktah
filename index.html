@@ -3,110 +3,151 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Countdown</title>
+<title>Unlocking Soon</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
 <style>
     body {
         background-color: #0a0a0a;
-        color: #f8f0e3;
-        font-family: 'Cinzel', serif;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+        color: #f5f5f5;
+        font-family: 'Cinzel Decorative', serif;
+        text-align: center;
+        padding: 0;
+        margin: 0;
         height: 100vh;
         overflow: hidden;
-        margin: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
+
     h1 {
-        font-size: 1.5rem;
-        margin-bottom: 20px;
-        opacity: 0;
-        animation: fadeIn 2s ease-in-out forwards;
+        font-size: 2.2rem;
+        max-width: 90%;
+        text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
     }
+
     #countdown {
-        font-size: 2rem;
-        font-weight: bold;
+        font-family: 'IM Fell English SC', serif;
+        font-size: 1.8rem;
+        margin-top: 15px;
+        color: #ff4444;
+        text-shadow: 0 0 8px #ff0000;
     }
-    #embersText {
+
+    #quote {
         position: absolute;
-        font-size: 1.2rem;
-        bottom: 15%;
+        bottom: 80px;
+        font-size: 1.4rem;
+        font-family: 'IM Fell English SC', serif;
+        color: #ff6666;
         opacity: 0;
-        animation: fadeIn 2s ease-in-out 1s forwards, fadeOut 2s ease-in-out 6s forwards;
     }
+
     canvas {
         position: absolute;
-        top: 0;
         left: 0;
+        top: 0;
         pointer-events: none;
-    }
-    @keyframes fadeIn {
-        to { opacity: 1; }
-    }
-    @keyframes fadeOut {
-        to { opacity: 0; }
     }
 </style>
 </head>
 <body>
     <h1>This page will unlock on 15th August 2029, the day you turn 21.</h1>
     <div id="countdown"></div>
-    <div id="embersText">Every second here knows more than it should</div>
-    <canvas id="embers"></canvas>
+    <div id="quote">EVERY SECOND HERE KNOWS MORE THAN IT SHOULD</div>
+    <canvas id="particles"></canvas>
 
 <script>
-    // Countdown Logic
+    // Countdown Timer
     const countdownEl = document.getElementById('countdown');
     const targetDate = new Date("August 15, 2029 00:00:00").getTime();
 
     function updateCountdown() {
-        const now = Date.now();
-        const diff = targetDate - now;
+        const now = new Date().getTime();
+        const distance = targetDate - now;
 
-        if (diff <= 0) {
+        if (distance <= 0) {
             countdownEl.innerHTML = "Unlocked!";
             return;
         }
 
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-        countdownEl.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        countdownEl.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s left`;
     }
+
     setInterval(updateCountdown, 1000);
     updateCountdown();
 
-    // Smooth Crazy Embers
-    const canvas = document.getElementById('embers');
+    // Quote Fade In, Ember Particles, Fade Out
+    const quoteEl = document.getElementById('quote');
+    const canvas = document.getElementById('particles');
     const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
 
-    let embers = [];
-    class Ember {
-        constructor() {
-            this.reset();
+    let particles = [];
+    let animationStarted = false;
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function createParticlesFromText(textElement) {
+        const rect = textElement.getBoundingClientRect();
+        const x = rect.left;
+        const y = rect.top;
+        const w = rect.width;
+        const h = rect.height;
+
+        for (let i = 0; i < 200; i++) {
+            particles.push({
+                x: x + Math.random() * w,
+                y: y + Math.random() * h,
+                vx: (Math.random() - 0.5) * 2,
+                vy: Math.random() * -2 - 1,
+                alpha: 1,
+                size: Math.random() * 3 + 2
+            });
         }
-        reset() {
-            this.x = Math.random() * canvas.width;
-            this.y = canvas.height + Math.random() * 50;
-            this.size = Math.random() * 3 + 2;
-            this.speedY = Math.random() * 1.5 + 0.5;
-            this.speedX = (Math.random() - 0.5) * 0.6;
-            this.life = Math.random() * 80 + 80;
-            this.opacity = 1;
-            this.hue = Math.random() * 30 + 20; // warm ember color
-        }
-        update() {
-            this.x += this.speedX + Math.sin(this.life * 0.05) * 0.3;
-            this.y -= this.speedY;
-            this.life--;
-            this.opacity = this.life / 100;
-            if (this.life <= 0) this.reset();
-        }
-        draw() {
+    }
+
+    function animateParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach((p, i) => {
+            p.x += p.vx + 0.5; // wind drift right
+            p.y += p.vy;
+            p.alpha -= 0.01;
+            ctx.fillStyle = `rgba(255, ${Math.floor(100 + Math.random()*155)}, 0, ${p.alpha})`;
             ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ct
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+
+            if (p.alpha <= 0) particles.splice(i, 1);
+        });
+
+        if (particles.length > 0) {
+            requestAnimationFrame(animateParticles);
+        }
+    }
+
+    function startQuoteAnimation() {
+        quoteEl.style.transition = "opacity 2s ease-in";
+        quoteEl.style.opacity = 1;
+
+        setTimeout(() => {
+            createParticlesFromText(quoteEl);
+            quoteEl.style.opacity = 0;
+            animateParticles();
+        }, 3000);
+    }
+
+    setTimeout(startQuoteAnimation, 2000);
+</script>
+</body>
+</html>
