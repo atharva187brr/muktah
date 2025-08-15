@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Unlocking Soon</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=IM+Fell+English+SC&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@500&display=swap" rel="stylesheet">
 <style>
     body {
-        background-color: #0a0a0a;
-        color: #f5f5f5;
-        font-family: 'Cinzel Decorative', serif;
+        background-color: #fff0f5;
+        color: #ff4da6;
+        font-family: 'Pacifico', cursive;
         text-align: center;
         padding: 0;
         margin: 0;
@@ -22,32 +22,24 @@
     }
 
     h1 {
-        font-size: 2.2rem;
+        font-size: 2rem; /* same as countdown */
         max-width: 90%;
-        text-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+        text-shadow: 0 0 6px rgba(255, 182, 193, 0.8);
+        margin-bottom: 15px;
     }
 
     #countdown {
-        font-family: 'IM Fell English SC', serif;
-        font-size: 1.8rem;
-        margin-top: 15px;
-        color: #ff4444;
-        text-shadow: 0 0 8px #ff0000;
-    }
-
-    #quote {
-        position: absolute;
-        bottom: 80px;
-        font-size: 1.4rem;
-        font-family: 'IM Fell English SC', serif;
-        color: #ff6666;
-        opacity: 0;
+        font-family: 'Quicksand', sans-serif;
+        font-size: 2rem; /* same as h1 */
+        color: #ff66b2;
+        font-weight: bold;
+        text-shadow: 0 0 6px rgba(255, 105, 180, 0.6);
     }
 
     canvas {
         position: absolute;
-        left: 0;
         top: 0;
+        left: 0;
         pointer-events: none;
     }
 </style>
@@ -55,7 +47,6 @@
 <body>
     <h1>This page will unlock on 15th August 2029, the day you turn 21.</h1>
     <div id="countdown"></div>
-    <div id="quote">EVERY SECOND HERE KNOWS MORE THAN IT SHOULD</div>
     <canvas id="particles"></canvas>
 
 <script>
@@ -83,13 +74,11 @@
     setInterval(updateCountdown, 1000);
     updateCountdown();
 
-    // Quote Fade In, Ember Particles, Fade Out
-    const quoteEl = document.getElementById('quote');
+    // Floating hearts/confetti animation
     const canvas = document.getElementById('particles');
     const ctx = canvas.getContext('2d');
 
     let particles = [];
-    let animationStarted = false;
 
     function resizeCanvas() {
         canvas.width = window.innerWidth;
@@ -98,56 +87,41 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    function createParticlesFromText(textElement) {
-        const rect = textElement.getBoundingClientRect();
-        const x = rect.left;
-        const y = rect.top;
-        const w = rect.width;
-        const h = rect.height;
-
-        for (let i = 0; i < 200; i++) {
-            particles.push({
-                x: x + Math.random() * w,
-                y: y + Math.random() * h,
-                vx: (Math.random() - 0.5) * 2,
-                vy: Math.random() * -2 - 1,
-                alpha: 1,
-                size: Math.random() * 3 + 2
-            });
-        }
+    function createParticle() {
+        const shapes = ['❤', '★', '✿'];
+        const shape = shapes[Math.floor(Math.random() * shapes.length)];
+        return {
+            x: Math.random() * canvas.width,
+            y: canvas.height + 20,
+            size: Math.random() * 20 + 15,
+            speedY: Math.random() * 1.5 + 0.5,
+            speedX: (Math.random() - 0.5) * 1,
+            char: shape,
+            alpha: Math.random() * 0.5 + 0.5
+        };
     }
 
-    function animateParticles() {
+    function drawParticles() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        particles.forEach((p, i) => {
-            p.x += p.vx + 0.5; // wind drift right
-            p.y += p.vy;
-            p.alpha -= 0.01;
-            ctx.fillStyle = `rgba(255, ${Math.floor(100 + Math.random()*155)}, 0, ${p.alpha})`;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            ctx.fill();
-
-            if (p.alpha <= 0) particles.splice(i, 1);
+        particles.forEach((p, index) => {
+            ctx.globalAlpha = p.alpha;
+            ctx.font = `${p.size}px 'Pacifico', cursive`;
+            ctx.fillStyle = ['#ff4da6', '#ff66b2', '#ff99cc'][Math.floor(Math.random()*3)];
+            ctx.fillText(p.char, p.x, p.y);
+            p.y -= p.speedY;
+            p.x += p.speedX;
+            if (p.y < -30) particles[index] = createParticle();
         });
-
-        if (particles.length > 0) {
-            requestAnimationFrame(animateParticles);
-        }
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(drawParticles);
     }
 
-    function startQuoteAnimation() {
-        quoteEl.style.transition = "opacity 2s ease-in";
-        quoteEl.style.opacity = 1;
-
-        setTimeout(() => {
-            createParticlesFromText(quoteEl);
-            quoteEl.style.opacity = 0;
-            animateParticles();
-        }, 3000);
+    // Initialize particles
+    for (let i = 0; i < 30; i++) {
+        particles.push(createParticle());
     }
 
-    setTimeout(startQuoteAnimation, 2000);
+    drawParticles();
 </script>
 </body>
 </html>
